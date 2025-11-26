@@ -78,3 +78,8 @@ export default function Login() {
     </div>
   );
 }
+
+// Force server-side rendering to prevent static export
+export async function getServerSideProps() {
+  return { props: {} };
+}

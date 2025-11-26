@@ -220,3 +220,8 @@ export default function Dashboard() {
     </div>
   );
 }
+
+// Force server-side rendering to prevent static export
+export async function getServerSideProps() {
+  return { props: {} };
+}

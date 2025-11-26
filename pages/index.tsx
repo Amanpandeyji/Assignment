@@ -81,3 +81,8 @@ export default function Home() {
     </div>
   );
 }
+
+// Force server-side rendering to prevent static export
+export async function getServerSideProps() {
+  return { props: {} };
+}

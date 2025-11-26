@@ -23,3 +23,8 @@ export default function SignUpPage() {
     </div>
   );
 }
+
+// Force server-side rendering to prevent static export
+export async function getServerSideProps() {
+  return { props: {} };
+}
