@@ -1,14 +1,31 @@
 import { neon } from '@neondatabase/serverless';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is not set');
-}
+const DB_URL = process.env.DATABASE_URL || '';
 
-const sql = neon(process.env.DATABASE_URL);
+// Don't throw at import time — that breaks Next.js static export/build when
+// environment variables are not yet configured (for example on preview deploys).
+// Warn instead and create a lazy stub that throws at runtime if DB is used.
+let sql: any;
+if (!DB_URL) {
+  console.warn('DATABASE_URL environment variable is not set — DB operations will fail at runtime');
+  sql = new Proxy({}, {
+    get() {
+      return () => {
+        throw new Error('DATABASE_URL is not configured. Set DATABASE_URL to enable DB operations.');
+      };
+    }
+  });
+} else {
+  sql = neon(DB_URL);
+}
 
 // Initialize database schema
 export async function initializeDatabase() {
   try {
+    if (!DB_URL) {
+      console.warn('Skipping database initialization: DATABASE_URL not set');
+      return;
+    }
     // Create users table (Clerk will handle auth, but we store references)
     await sql`
       CREATE TABLE IF NOT EXISTS users (
